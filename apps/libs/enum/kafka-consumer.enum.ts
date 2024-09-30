@@ -1,4 +1,4 @@
 export enum KafkaConsumer {
-  TRANSACTIONS = 'transactions-consumer',
-  ANTI_FRAUD = 'anti-fraud-consumer',
+  TRANSACTIONS = 'transactions-group',
+  ANTI_FRAUD = 'anti-fraud-group',
 }

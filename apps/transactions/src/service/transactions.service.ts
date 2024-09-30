@@ -19,12 +19,6 @@ export class TransactionsService {
     private transactionStatusRepository: Repository<TransactionStatus>,
   ) {}
 
-  async getAll() {
-    return await Promise.all([
-      this.transactionsRepository.find({ relations: ['transactionStatus'] }),
-    ]);
-  }
-
   async createTransaction(transactionData: CreateTransactionDto) {
     const transactionType = await this.transactionTypeRepository.findOne({
       where: { id: TransactionTypes.DEBIT },

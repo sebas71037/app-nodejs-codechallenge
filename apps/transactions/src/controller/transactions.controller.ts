@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Logger, Get } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Logger } from '@nestjs/common';
 import { TransactionsService } from '../service/transactions.service';
 import { ClientKafka, EventPattern, Payload } from '@nestjs/microservices';
 import { ServiceInjection } from '../../../libs/enum/service-injection.enum';
@@ -12,13 +12,6 @@ export class TransactionsController {
     @Inject(ServiceInjection.KAFKA) private readonly kafkaService: ClientKafka,
     private readonly transactionsService: TransactionsService,
   ) {}
-
-  @Get()
-  async getHello(): Promise<string> {
-    const transactions = await this.transactionsService.getAll();
-    Logger.log(transactions);
-    return `Hello world :3`;
-  }
 
   @Post()
   async createTransaction(@Body() transactionDto: CreateTransactionDto) {
@@ -43,11 +36,24 @@ export class TransactionsController {
     };
   }
 
-  @EventPattern(Events.TRANSACTION_STATUS_UPDATED)
-  async handleStatusUpdate(@Payload() message: { id: string; status: Status }) {
-    Logger.log(`Updating transaction status event.`);
+  @EventPattern(Events.REJECTED_STATUS_TRANSACTION)
+  async rejectedStatusUpdate(@Payload() message: { id: string }) {
+    Logger.log(`Updating rejected transaction status event.`);
 
-    const { id, status } = message;
+    const { id } = message;
+    const status = Status.REJECTED;
+
+    await this.transactionsService.updateTransactionStatus(id, status);
+
+    Logger.log(`Transaction ${id} updated with status ${status}`);
+  }
+
+  @EventPattern(Events.APPROVED_STATUS_TRANSACTION)
+  async approvedStatusUpdate(@Payload() message: { id: string }) {
+    Logger.log(`Updating approved transaction status event.`);
+
+    const { id } = message;
+    const status = Status.APPROVED;
 
     await this.transactionsService.updateTransactionStatus(id, status);
 

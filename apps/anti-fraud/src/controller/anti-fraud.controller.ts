@@ -4,7 +4,6 @@ import { ClientKafka } from '@nestjs/microservices';
 import { Inject } from '@nestjs/common';
 import { Events } from 'apps/libs/enum/event.enum';
 import { ServiceInjection } from 'apps/libs/enum/service-injection.enum';
-import { Status } from 'apps/libs/enum/status.enum';
 
 @Controller()
 export class AntiFraudController {
@@ -16,16 +15,22 @@ export class AntiFraudController {
   async handleTransactionCreated(
     @Payload() message: { transactionId: string; amount: number },
   ) {
-    Logger.log(`Transaction created, validating with anti-fraud system event.`);
+    Logger.log(`Transaction created, validating with Anti-Fraud system event.`);
     const { transactionId, amount } = message;
 
-    const status = amount > 1000 ? Status.REJECTED : Status.APPROVED;
+    const rejected = amount > 1000;
 
-    Logger.log(`Sending Transaction ${transactionId} with status ${status}...`);
+    Logger.log(
+      `Sending ${rejected ? 'Rejected' : 'Approved'} Transaction ${transactionId}`,
+    );
 
-    this.kafkaService.emit(Events.TRANSACTION_STATUS_UPDATED, {
-      id: transactionId,
-      status,
-    });
+    this.kafkaService.emit(
+      rejected
+        ? Events.REJECTED_STATUS_TRANSACTION
+        : Events.APPROVED_STATUS_TRANSACTION,
+      {
+        id: transactionId,
+      },
+    );
   }
 }

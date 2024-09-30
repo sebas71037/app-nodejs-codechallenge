@@ -19,7 +19,7 @@ async function bootstrap() {
     transport: Transport.KAFKA,
     options: {
       client: {
-        brokers: [process.env.KAFKA_CLIENT_BROKER || 'kafka:9092'],
+        brokers: [process.env.KAFKA_CLIENT_BROKER || 'localhost:9092'],
       },
       consumer: {
         groupId: KafkaConsumer.TRANSACTIONS,
