@@ -10,6 +10,15 @@
   "monorepo": true,
   "root": "apps/application",
   "projects": {
+    "application": {
+      "type": "application",
+      "root": "apps/application",
+      "entryFile": "main",
+      "sourceRoot": "apps/application/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/application/tsconfig.app.json"
+      }
+    },
     "transactions": {
       "type": "application",
       "root": "apps/transactions",
