@@ -1,5 +1,17 @@
 version: "3.7"
 services:
+  transactions:
+    build: 
+      context: .
+      dockerfile: apps/transactions/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      - KAFKA_CLIENT_BROKER=kafka:9092
+      - TYPEORM_HOST=postgres
   postgres:
     image: postgres:14
     ports:
