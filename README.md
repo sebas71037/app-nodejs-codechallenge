@@ -1,82 +1,56 @@
-# Yape Code Challenge :rocket:
+# Start the project
 
-Our code challenge will let you marvel us with your Jedi coding skills :smile:. 
+The **docker-compose.yml** file has been updated to bring up 3 new containers:
 
-Don't forget that the proper way to submit your work is to fork the repo and create a PR :wink: ... have fun !!
+-   Transactions
+-   Anti-fraud
+-   PgAdmin
 
-- [Problem](#problem)
-- [Tech Stack](#tech_stack)
-- [Send us your challenge](#send_us_your_challenge)
+Run the project:
 
-# Problem
-
-Every time a financial transaction is created it must be validated by our anti-fraud microservice and then the same service sends a message back to update the transaction status.
-For now, we have only three transaction statuses:
-
-<ol>
-  <li>pending</li>
-  <li>approved</li>
-  <li>rejected</li>  
-</ol>
-
-Every transaction with a value greater than 1000 should be rejected.
-
-```mermaid
-  flowchart LR
-    Transaction -- Save Transaction with pending Status --> transactionDatabase[(Database)]
-    Transaction --Send transaction Created event--> Anti-Fraud
-    Anti-Fraud -- Send transaction Status Approved event--> Transaction
-    Anti-Fraud -- Send transaction Status Rejected event--> Transaction
-    Transaction -- Update transaction Status event--> transactionDatabase[(Database)]
+```bash
+docker-compose up --build -d
 ```
 
-# Tech Stack
+The transactions and anti-fraud services will not start immediately, waiting for the Kafka service to finish starting properly to avoid connection issues.
 
-<ol>
-  <li>Node. You can use any framework you want (i.e. Nestjs with an ORM like TypeOrm or Prisma) </li>
-  <li>Any database</li>
-  <li>Kafka</li>    
-</ol>
+## Containers
 
-We do provide a `Dockerfile` to help you get started with a dev environment.
+![containers](https://github.com/user-attachments/assets/9fc6f045-217d-4bdc-ad5f-49ec156290e5)
 
-You must have two resources:
+# Create transaction
+Before sending the request to create a transaction, it is necessary to check the logs of the **transactions** and **anti-fraud** containers. You can do this from the console by running:
 
-1. Resource to create a transaction that must containt:
-
-```json
-{
-  "accountExternalIdDebit": "Guid",
-  "accountExternalIdCredit": "Guid",
-  "tranferTypeId": 1,
-  "value": 120
-}
+```bash
+docker-compose logs -f container-name
 ```
 
-2. Resource to retrieve a transaction
+Send request: 
 
-```json
-{
-  "transactionExternalId": "Guid",
-  "transactionType": {
-    "name": ""
-  },
-  "transactionStatus": {
-    "name": ""
-  },
-  "value": 120,
-  "createdAt": "Date"
-}
+```curl
+curl --location 'http://localhost:3000/transactions' \
+--header 'Content-Type: application/json' \
+--data '{
+  "accountExternalIdDebit": "3a0d67f4-a62d-4e38-a161-1a31c321ac9f",
+  "accountExternalIdCredit": "087036f1-3fd3-4b1e-847e-21bf1fe23bfa",
+  "transferTypeId": 1,
+  "value": 100
+}'
 ```
 
-## Optional
+![request](https://github.com/user-attachments/assets/31ba5401-c2e9-495d-8594-02569f4ad65d)
 
-You can use any approach to store transaction data but you should consider that we may deal with high volume scenarios where we have a huge amount of writes and reads for the same data at the same time. How would you tackle this requirement?
+For the test, 2 requests were sent, one with a value of 1200 and another with a value of 1000, to have 2 transactions, one rejected and the other approved.
 
-You can use Graphql;
+Transaction and anti-fraud container consoles respectively:
 
-# Send us your challenge
+![logs](https://github.com/user-attachments/assets/e6879bd2-dd42-4091-9749-8ce7a76a9d51)
 
-When you finish your challenge, after forking a repository, you **must** open a pull request to our repository. There are no limitations to the implementation, you can follow the programming paradigm, modularization, and style that you feel is the most appropriate solution.
+You can check the database from **pgadmin**
 
-If you have any questions, please let us know.
+![pgadmin](https://github.com/user-attachments/assets/2b806ea8-669c-434d-8b66-b0f58773ffcd)
+
+**User:** admin@admin.com
+**Password:** admin
+
+
