@@ -42,11 +42,12 @@ export class TransactionsService {
 
     const transactionBody = {
       ...transactionData,
-      transactionStatus: transactionStatus,
-      TransactionType: transactionType,
     };
 
     const transaction = this.transactionsRepository.create(transactionBody);
+
+    transaction.transactionType = transactionType;
+    transaction.transactionStatus = transactionStatus;
 
     return await this.transactionsRepository.save(transaction);
   }
@@ -70,8 +71,8 @@ export class TransactionsService {
       );
     }
 
-    transaction.transactionStatus = transactionStatus;
-
-    return await this.transactionsRepository.save(transaction);
+    return await this.transactionsRepository.update(transaction.id, {
+      transactionStatus: transactionStatus,
+    });
   }
 }
