@@ -14,7 +14,7 @@ export class PostgresProvider implements TypeOrmOptionsFactory {
       password: process.env.TYPEORM_PASSWORD || 'postgres',
       database: process.env.TYPEORM_DATABASE || 'postgres',
       autoLoadEntities: true,
-      synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',
+      synchronize: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       logging: false,
     };
